@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MDsaving</title>
+
+  <style>
+    :root {
+      --bg-dark: #08090d;
+      --card-bg: rgba(18, 20, 29, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-orange: #ff7700;
+      --accent-cyan: #06b6d4;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #171926 0%, #08090d 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 380px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(255, 119, 0, 0.2) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 80%);
+      filter: blur(60px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 14px 0 4px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 119, 0, 0.12);
+      border: 1px solid rgba(255, 119, 0, 0.35);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: #ff9933;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      background: linear-gradient(135deg, #ffffff 30%, #cbd5e1 70%, #ff7700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .platforms-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .plat-chip {
+      background: rgba(25, 28, 40, 0.6);
+      border: 1px solid var(--card-border);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.25s ease;
+    }
+
+    .plat-chip.active {
+      background: rgba(255, 119, 0, 0.2);
+      border-color: #ff7700;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 119, 0, 0.4);
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--accent-orange);
+      margin-bottom: 10px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      gap: 8px;
+    }
+
+    .url-input {
+      flex: 1;
+      background: rgba(10, 11, 16, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 13px 14px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .url-input:focus {
+      border-color: var(--accent-orange);
+    }
+
+    .btn-paste {
+      background: linear-gradient(135deg, #2a2e40, #1c1f2b);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      color: #f1f5f9;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-paste:active {
+      background: var(--accent-orange);
+      color: #000;
+    }
+
+    .detect-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .mode-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mode-card {
+      background: rgba(10, 11, 16, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .mode-card.active.video {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(3, 105, 161, 0.15));
+      border-color: var(--accent-cyan);
+    }
+
+    .mode-card.active.audio {
+      background: linear-gradient(135deg, rgba(255, 119, 0, 0.2), rgba(180, 83, 9, 0.15));
+      border-color: var(--accent-orange);
+    }
+
+    .mode-card .icon { font-size: 24px; }
+    .mode-card .title-text { font-size: 13px; font-weight: 700; color: #ffffff; }
+    .mode-card .sub-text { font-size: 10px; color: var(--text-muted); }
+    .mode-card .quality-tag {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .preview-card {
+      display: none;
+      background: rgba(13, 15, 22, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .preview-thumb-box {
+      width: 76px;
+      height: 76px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #1e2230;
+    }
+
+    .preview-thumb { width: 100%; height: 100%; object-fit: cover; }
+    .preview-meta { flex: 1; min-width: 0; }
+    .preview-heading {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .preview-info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .info-pill {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 10px;
+      color: #cbd5e1;
+    }
+
+    .btn-main-download {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: linear-gradient(135deg, #ff7700 0%, #ea580c 100%);
+      color: #000000;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 25px rgba(255, 119, 0, 0.35);
+    }
+
+    .btn-main-download:active { transform: scale(0.98); }
+    .btn-main-download:disabled { opacity: 0.6; }
+
+    .toast-status {
+      font-size: 12px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-muted);
+      min-height: 20px;
+    }
+
+    .toast-status.success { color: #34d399; }
+    .toast-status.error { color: #f87171; }
+
+    .server-setting {
+      background: rgba(18, 20, 29, 0.4);
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .server-input {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #fff;
+      padding: 4px 8px;
+      font-size: 11px;
+      width: 160px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <div class="container">
+
+    <header class="header">
+      <div class="badge-pill">⚡ Native Android Edition</div>
+      <h1 class="title">MDsaving</h1>
+      <p class="subtitle">Download Video B-Roll & Musik hanya dengan 1 Salinan</p>
+
+      <div class="platforms-grid">
+        <div class="plat-chip" data-plat="tiktok">📱 TikTok</div>
+        <div class="plat-chip" data-plat="instagram">📸 Instagram</div>
+        <div class="plat-chip" data-plat="spotify">🎵 Spotify</div>
+        <div class="plat-chip" data-plat="youtube">▶️ YouTube</div>
+        <div class="plat-chip" data-plat="ytmusic">🎧 YT Music</div>
+        <div class="plat-chip" data-plat="twitter">🐦 X/Twitter</div>
+      </div>
+    </header>
+
+    <section class="glass-card">
+      <div class="card-title">
+        <span>🔗 1. Link Media</span>
+        <span style="font-size: 10px; color: var(--text-muted);">Quick Share Active</span>
+      </div>
+
+      <div class="input-wrapper">
+        <input type="url" id="urlInput" class="url-input" placeholder="Tempelkan link TikTok, IG, Spotify..." />
+        <button id="pasteBtn" class="btn-paste">📋 Paste</button>
+      </div>
+
+      <div id="platIndicator" class="detect-badge">
+        <span>🌐</span>
+        <span id="platStatusText">Siap mendeteksi platform otomatis</span>
+      </div>
+    </section>
+
+    <section class="glass-card">
+      <div class="card-title">
+        <span style="color: var(--accent-cyan);">⚙️ 2. Format Output</span>
+      </div>
+
+      <div class="mode-container">
+        <div id="modeVideoCard" class="mode-card active video">
+          <div class="quality-tag">MP4 FHD</div>
+          <div class="icon">🎬</div>
+          <div class="title-text">Video B-Roll</div>
+          <div class="sub-text">Tanpa Watermark</div>
+        </div>
+
+        <div id="modeAudioCard" class="mode-card audio">
+          <div class="quality-tag">320 kbps</div>
+          <div class="icon">🎵</div>
+          <div class="title-text">Musik / Audio</div>
+          <div class="sub-text">MP3 Studio Grade</div>
+        </div>
+      </div>
+    </section>
+
+    <div id="previewCard" class="preview-card">
+      <div class="preview-thumb-box">
+        <img id="thumbImg" class="preview-thumb" src="" alt="Cover" />
+      </div>
+      <div class="preview-meta">
+        <div id="previewTitle" class="preview-heading">Judul Media</div>
+        <div class="preview-info-row">
+          <span id="previewPlatBadge" class="info-pill">Platform</span>
+          <span id="previewDur">--:--</span>
+        </div>
+      </div>
+    </div>
+
+    <button id="downloadBtn" class="btn-main-download">
+      <span>⬇ UNDUH KE HP SEKARANG</span>
+    </button>
+
+    <div id="statusMsg" class="toast-status"></div>
+
+    <div class="server-setting">
+      <span>⚙️ Endpoint Server:</span>
+      <input type="text" id="serverInput" class="server-input" value="http://192.168.1.15:8888" />
+    </div>
+
+  </div>
+
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const platStatusText = document.getElementById('platStatusText');
+    const modeVideoCard = document.getElementById('modeVideoCard');
+    const modeAudioCard = document.getElementById('modeAudioCard');
+    const previewCard = document.getElementById('previewCard');
+    const thumbImg = document.getElementById('thumbImg');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewPlatBadge = document.getElementById('previewPlatBadge');
+    const previewDur = document.getElementById('previewDur');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const serverInput = document.getElementById('serverInput');
+    const chips = document.querySelectorAll('.plat-chip');
+
+    let currentMode = 'video';
+    let checkTimeout = null;
+
+    // Load saved server endpoint
+    const savedServer = localStorage.getItem('mdsaving_server');
+    if (savedServer) serverInput.value = savedServer;
+    serverInput.addEventListener('change', () => {
+      localStorage.setItem('mdsaving_server', serverInput.value.trim());
+    });
+
+    function getServerUrl() {
+      let s = serverInput.value.trim();
+      return s.endsWith('/') ? s.slice(0, -1) : s;
+    }
+
+    modeVideoCard.addEventListener('click', () => {
+      currentMode = 'video';
+      modeVideoCard.classList.add('active', 'video');
+      modeAudioCard.classList.remove('active', 'audio');
+      downloadBtn.innerHTML = "<span>⬇ UNDUH VIDEO B-ROLL (MP4)</span>";
+    });
+
+    modeAudioCard.addEventListener('click', () => {
+      currentMode = 'audio';
+      modeAudioCard.classList.add('active', 'audio');
+      modeVideoCard.classList.remove('active', 'video');
+      downloadBtn.innerHTML = "<span>⬇ UNDUH MUSIK / AUDIO (MP3)</span>";
+    });
+
+    function detectPlatform(url) {
+      const u = url.toLowerCase();
+      if (u.includes('spotify.com') || u.includes('spotify.link')) return { key: 'spotify', name: 'Spotify Music', icon: '🎵', color: '#1ed760' };
+      if (u.includes('tiktok.com')) return { key: 'tiktok', name: 'TikTok B-Roll', icon: '📱', color: '#fe2c55' };
+      if (u.includes('instagram.com') || u.includes('instagr.am')) return { key: 'instagram', name: 'Instagram Reels', icon: '📸', color: '#e1306c' };
+      if (u.includes('music.youtube.com')) return { key: 'ytmusic', name: 'YouTube Music', icon: '🎧', color: '#ff0000' };
+      if (u.includes('youtube.com') || u.includes('youtu.be')) return { key: 'youtube', name: 'YouTube HD/4K', icon: '▶️', color: '#ff0000' };
+      if (u.includes('twitter.com') || u.includes('x.com')) return { key: 'twitter', name: 'X / Twitter Video', icon: '🐦', color: '#1da1f2' };
+      return { key: 'universal', name: 'Universal Media', icon: '🌐', color: '#06b6d4' };
+    }
+
+    function updatePillsHighlight(key) {
+      chips.forEach(chip => {
+        if (chip.getAttribute('data-plat') === key) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+
+    urlInput.addEventListener('input', () => {
+      const val = urlInput.value.trim();
+      if (val.startsWith('http://') || val.startsWith('https://')) {
+        const p = detectPlatform(val);
+        platStatusText.innerHTML = `<span style="color:${p.color}; font-weight:700;">${p.icon} ${p.name} Terdeteksi</span>`;
+        updatePillsHighlight(p.key);
+        clearTimeout(checkTimeout);
+        checkTimeout = setTimeout(fetchMediaMetadata, 500);
+      } else {
+        platStatusText.innerText = "Siap mendeteksi platform media sosial otomatis";
+        updatePillsHighlight(null);
+      }
+    });
+
+    // Native Shared URL Receiver (Called from Java MainActivity)
+    window.setIncomingSharedUrl = function(url) {
+      if (url) {
+        urlInput.value = url;
+        urlInput.dispatchEvent(new Event('input'));
+        if (window.AndroidBridge && window.AndroidBridge.showToast) {
+          window.AndroidBridge.showToast("MDsaving: Link terdeteksi!");
+        }
+      }
+    };
+
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            urlInput.value = text.trim();
+            urlInput.dispatchEvent(new Event('input'));
+          }
+        } else {
+          urlInput.focus();
+        }
+      } catch (err) {
+        urlInput.focus();
+      }
+    });
+
+    async function fetchMediaMetadata() {
+      const url = urlInput.value.trim();
+      if (!url) return;
+
+      statusMsg.className = "toast-status";
+      statusMsg.innerText = "Mengambil detail media...";
+
+      try {
+        const res = await fetch(`${getServerUrl()}/api/info`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+
+        if (res.ok && !data.error) {
+          previewTitle.innerText = data.title;
+          previewPlatBadge.innerText = `${data.platform_icon || '🌐'} ${data.platform || 'Media'}`;
+          previewDur.innerText = data.duration_str ? `Durasi: ${data.duration_str}` : '';
+
+          if (data.thumbnail_url) {
+            thumbImg.src = data.thumbnail_url;
+            thumbImg.style.display = 'block';
+          } else {
+            thumbImg.style.display = 'none';
+          }
+
+          previewCard.style.display = 'flex';
+          statusMsg.className = "toast-status success";
+          statusMsg.innerText = "✓ Media siap diunduh!";
+        } else {
+          statusMsg.className = "toast-status error";
+          statusMsg.innerText = data.error || "Gagal memuat info media.";
+        }
+      } catch (e) {
+        statusMsg.className = "toast-status error";
+        statusMsg.innerText = "Koneksi ke server belum terhubung. Periksa IP.";
+      }
+    }
+
+    downloadBtn.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+      if (!url) {
+        alert("Silakan tempelkan link media terlebih dahulu.");
+        return;
+      }
+
+      downloadBtn.disabled = true;
+      const originalText = downloadBtn.innerHTML;
+      downloadBtn.innerHTML = "<span>Sedang Memproses...</span>";
+      statusMsg.className = "toast-status";
+      statusMsg.innerText = "Sedang mengunduh file...";
+
+      try {
+        const response = await fetch(`${getServerUrl()}/api/download`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, mode: currentMode })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || "Gagal mengunduh file.");
+        }
+
+        let filename = (currentMode === 'audio') ? "MDsaving_Audio.mp3" : "MDsaving_Video.mp4";
+        const disposition = response.headers.get('Content-Disposition');
+        if (disposition && disposition.indexOf('filename=') !== -1) {
+          const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+          if (matches != null && matches[1]) {
+            filename = matches[1].replace(/['"]/g, '');
+            try { filename = decodeURIComponent(filename); } catch (e) {}
+          }
+        }
+
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        document.body.removeChild(a);
+
+        statusMsg.className = "toast-status success";
+        statusMsg.innerText = `✅ File "${filename}" tersimpan!`;
+        if (window.AndroidBridge && window.AndroidBridge.showToast) {
+          window.AndroidBridge.showToast("Berhasil diunduh: " + filename);
+        }
+      } catch (err) {
+        statusMsg.className = "toast-status error";
+        statusMsg.innerText = `⚠️ ${err.message}`;
+      } finally {
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = originalText;
+      }
+    });
+  </script>
+</body>
+</html>
